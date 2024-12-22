@@ -93,7 +93,6 @@ jobs:
       - name: Push changes to main branch
         run: |
           # 确保当前目录是仓库根目录
-          cd /home/runner/work/PaoPaoDNS-Pref-Domain/PaoPaoDNS-Pref-Domain
 
           # 确保 Git 配置正确
           git config --global user.name "github-actions[bot]"
