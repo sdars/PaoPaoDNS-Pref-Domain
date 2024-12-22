@@ -18,18 +18,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 下载远程规则并合并
+      # 安装 yq 用于解析 YAML 文件
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+      # 读取配置文件并合并规则
       - name: Download and merge rules
         run: |
-          # 定义文件路径
-          REMOTE_RULES=("https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt" "https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt")
-          LOCAL_RULE_FILE="resource/myrule.txt"
-          OUTPUT_FILE="output/knightdomain.txt"  # 输出路径更改为 output
+          # 读取 application.yml 中的规则和输出路径
+          REMOTE_RULES=($(yq eval '.rules.remote' config/application.yml | sed 's/- //g'))  # 获取远程规则列表
+          LOCAL_RULES=($(yq eval '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
+          OUTPUT_PATH=$(yq eval '.output.path' config/application.yml)  # 获取输出目录
+          OUTPUT_FILE=$(yq eval '.output.file' config/application.yml)  # 获取输出文件名
 
           # 创建输出目录
-          mkdir -p output  # 创建 output 目录
+          mkdir -p "$OUTPUT_PATH"
 
-          # 下载远程规则
+          # 下载远程规则并合并
           TEMP_FILE=$(mktemp)
           for url in "${REMOTE_RULES[@]}"; do
             echo "Downloading $url..."
@@ -38,20 +47,22 @@ jobs:
 
           # 合并本地规则
           echo "Merging local rules..."
-          if [ -f "$LOCAL_RULE_FILE" ]; then
-            cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
-          else
-            echo "Local rule file not found: $LOCAL_RULE_FILE"
-          fi
+          for local_file in "${LOCAL_RULES[@]}"; do
+            if [ -f "$local_file" ]; then
+              cat "$local_file" >> "$TEMP_FILE"
+            else
+              echo "Local rule file not found: $local_file"
+            fi
+          done
 
           # 去除注释和重复项
           echo "Removing duplicates and comments..."
-          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_FILE"  # 保存到 output
+          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_PATH/$OUTPUT_FILE"
 
           # 清理临时文件
           rm -f "$TEMP_FILE"
 
-          echo "Merged rules saved to $OUTPUT_FILE"
+          echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
 
       # 提交更改到 main 分支
       - name: Push changes to main branch
@@ -66,8 +77,8 @@ jobs:
           git checkout main
 
           # 添加文件并提交
-          git add output/knightdomain.txt  # 使用新的路径
-          git commit -m "Updated knightdomain.txt at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git add "$OUTPUT_PATH/$OUTPUT_FILE"
+          git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
           # 推送更改到远程 main 分支
           git push origin main --force
