@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # 手动触发
   push: # 文件更新时触发
     paths:
-      - 'rule/**' # 监控 resource 文件夹中的所有文件
+      - 'rule/**' # 监控 rule 文件夹中的所有文件
 
 jobs:
   update-rules:
@@ -24,10 +24,10 @@ jobs:
           # 定义文件路径
           REMOTE_RULES=("https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt" "https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt")
           LOCAL_RULE_FILE="resource/myrule.txt"
-          OUTPUT_FILE="rule/knightdomain.txt"
+          OUTPUT_FILE="output/knightdomain.txt"  # 输出路径更改为 output
 
           # 创建输出目录
-          mkdir -p rule
+          mkdir -p output  # 创建 output 目录
 
           # 下载远程规则
           TEMP_FILE=$(mktemp)
@@ -46,7 +46,7 @@ jobs:
 
           # 去除注释和重复项
           echo "Removing duplicates and comments..."
-          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_FILE"
+          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_FILE"  # 保存到 output
 
           # 清理临时文件
           rm -f "$TEMP_FILE"
@@ -66,7 +66,7 @@ jobs:
           git checkout main
 
           # 添加文件并提交
-          git add output/rule/knightdomain.txt
+          git add output/knightdomain.txt  # 使用新的路径
           git commit -m "Updated knightdomain.txt at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
           # 推送更改到远程 main 分支
