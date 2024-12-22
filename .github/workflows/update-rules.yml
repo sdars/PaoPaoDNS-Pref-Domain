@@ -107,7 +107,6 @@ jobs:
           # 检查输出路径并提交更改
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
-          echo "你好$OUTPUT_PATH/$OUTPUT_FILE"
           echo "Checking if there are changes to commit..."
           git add "$OUTPUT_PATH/$OUTPUT_FILE"
           
