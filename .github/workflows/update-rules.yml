@@ -5,10 +5,12 @@ on:
     # 每天运行三次（00:00, 08:00, 16:00 UTC）
     - cron: "0 0,8,16 * * *"
   workflow_dispatch: # 手动触发
-  push: # 文件更新时触发
-    paths:
-      - 'resource/**'  # 监控 resource 文件夹中的所有文件
-
+    push:
+      paths-ignore:
+        - 'README.md'
+        - '*.md'
+      branches: [ main ]
+    
 jobs:
   update-rules:
     runs-on: ubuntu-latest
