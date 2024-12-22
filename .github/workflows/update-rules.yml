@@ -43,6 +43,7 @@ jobs:
           TEMP_FILE=$(mktemp)
           for url in "${REMOTE_RULES[@]}"; do
             echo "Downloading $url..."
+            url=$(echo $url | sed "s/'//g")  # 移除单引号
             curl -s "$url" >> "$TEMP_FILE"
           done
 
