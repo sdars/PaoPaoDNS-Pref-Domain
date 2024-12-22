@@ -88,7 +88,9 @@ jobs:
           rm -f "$TEMP_FILE"
 
           echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
-
+      # 在 Checkout 之后的某个地方，打印路径调试：
+        - name: Debug output path
+          run: echo "Output path: $OUTPUT_PATH"
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
