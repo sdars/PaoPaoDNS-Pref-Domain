@@ -3,7 +3,7 @@ rules:
     - 'https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt'
     - 'https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt'
   local: # 本地规则文件路径（相对于仓库根目录）
-    - 'resource/myrule.txt'
+    - 'rule/myrule.txt'
 
 output:
   path: 'resource/config' # 输出目录
