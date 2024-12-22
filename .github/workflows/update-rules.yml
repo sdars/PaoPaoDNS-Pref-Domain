@@ -55,6 +55,10 @@ jobs:
             OUTPUT_FILE="knightdomain.txt"  # 设置默认文件名
           fi
 
+          # 打印 OUTPUT_PATH 确保其值正确
+          echo "Final OUTPUT_PATH: $OUTPUT_PATH"
+          echo "Final OUTPUT_FILE: $OUTPUT_FILE"
+
           # 创建输出目录
           echo "Creating output directory: $OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
