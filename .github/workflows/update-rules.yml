@@ -35,8 +35,8 @@ jobs:
           LOCAL_RULES=($(yq eval '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
           OUTPUT_PATH=$(yq eval '.output.path' config/application.yml)  # 获取输出目录
           OUTPUT_FILE=$(yq eval '.output.file' config/application.yml)  # 获取输出文件名
-          OUTPUT_PATH=$(echo $OUTPUT_PATH | sed "s/'//g")
-          OUTPUT_FILE=$(echo $OUTPUT_FILE | sed "s/'//g")
+          OUTPUT_PATH=$(echo $OUTPUT_PATH | sed "s/'//g")  # 移除多余单引号
+          OUTPUT_FILE=$(echo $OUTPUT_FILE | sed "s/'//g")  # 移除多余单引号
           # 创建输出目录
           mkdir -p "$OUTPUT_PATH"
 
@@ -67,6 +67,12 @@ jobs:
 
           echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
 
+      # 调试输出，确保文件存在
+      - name: Check output path
+        run: |
+          echo "Output path: $OUTPUT_PATH"
+          ls -l "$OUTPUT_PATH"
+
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
@@ -79,9 +85,11 @@ jobs:
           # 切换到 main 分支
           git checkout main
 
-          # 添加文件并提交
-          git add "$OUTPUT_PATH/$OUTPUT_FILE"
-          git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-
-          # 推送更改到远程 main 分支
-          git push origin main --force
+          # 检查文件是否存在并添加
+          if [ -f "$OUTPUT_PATH/$OUTPUT_FILE" ]; then
+            git add "$OUTPUT_PATH/$OUTPUT_FILE"
+            git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+            git push origin main --force
+          else
+            echo "Output file not found: $OUTPUT_PATH/$OUTPUT_FILE"
+          fi
