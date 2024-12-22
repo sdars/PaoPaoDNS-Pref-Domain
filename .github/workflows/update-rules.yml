@@ -1,76 +1,64 @@
-name: Update Filters
+name: Update Rules and Generate Config
 
 on:
-  push:
-    paths-ignore:
-      - 'README.md'
-      - '*.md'
-    branches: [main]
   schedule:
-    - cron: 0 */12 * * *  # 每 12 小时执行一次
-  workflow_dispatch:
-
-env:
-  TZ: Asia/Shanghai
+    # 每天运行三次（00:00, 08:00, 16:00 UTC）
+    - cron: "0 0,8,16 * * *"
+  workflow_dispatch: # 手动触发
 
 jobs:
-  Update_Filters:
+  update-rules:
     runs-on: ubuntu-latest
 
     steps:
       # 检出代码
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # 安装依赖（如 curl 和 yq）
-      - name: Install Dependencies
+      # 解析配置并生成规则
+      - name: Parse config and generate rules
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl jq
-
-      # 读取配置并处理规则
-      - name: Process Rules
-        run: |
-          # 定义文件路径
+          # 定义配置文件路径
           CONFIG_FILE="config/application.yml"
-          TEMP_RULES=$(mktemp)
-          OUTPUT_DIR="output"
-          OUTPUT_FILE="domain.txt"
+
+          # 解析 YAML 配置
+          REMOTE_RULES=$(yq '.rules.remote[]' "$CONFIG_FILE")
+          LOCAL_RULES=$(yq '.rules.local[]' "$CONFIG_FILE")
+          OUTPUT_DIR=$(yq '.output.path' "$CONFIG_FILE")
+          OUTPUT_FILE=$(yq '.output.file' "$CONFIG_FILE")
 
           # 创建输出目录
-          mkdir -p $OUTPUT_DIR
+          mkdir -p "$OUTPUT_DIR"
 
-          # 读取远程规则
-          REMOTE_RULES=$(yq '.application.rule.remote[]' $CONFIG_FILE)
+          # 下载远程规则
+          TEMP_FILE=$(mktemp)
           echo "Downloading remote rules..."
           for url in $REMOTE_RULES; do
-            echo "Fetching $url..."
-            curl -s "$url" >> "$TEMP_RULES"
+            echo "Fetching $url"
+            curl -s "$url" >> "$TEMP_FILE"
           done
 
-          # 读取本地规则
-          LOCAL_RULES=$(yq '.application.rule.local[]' $CONFIG_FILE)
-          echo "Adding local rules..."
-          for file in $LOCAL_RULES; do
-            cat "$file" >> "$TEMP_RULES"
+          # 合并本地规则
+          echo "Merging local rules..."
+          for local_file in $LOCAL_RULES; do
+            cat "$local_file" >> "$TEMP_FILE"
           done
 
-          # 去重和清理
-          echo "Removing duplicates and comments..."
-          grep -vE '^\s*#|^\s*$' "$TEMP_RULES" | sort -u > "$OUTPUT_DIR/$OUTPUT_FILE"
+          # 去除注释和重复项
+          echo "Processing rules..."
+          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_DIR/$OUTPUT_FILE"
 
-          echo "Rules processed and saved to $OUTPUT_DIR/$OUTPUT_FILE"
+          # 清理临时文件
+          rm -f "$TEMP_FILE"
+
+          echo "Rules saved to $OUTPUT_DIR/$OUTPUT_FILE"
 
       # 提交结果到 main 分支
-      - name: Commit Changes
-        id: commit
+      - name: Push changes to main branch
         run: |
-          git config --local user.email "2821711637@qq.com"
-          git config --local user.name "sdars"
-          git add output/
-          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # 推送更改
-      - name: GitHub Push
-        if: steps.commit.outputs.status == 'success' && !cancelled()
-        run: |
+          git add resource/config/knightdomain.txt
+          git commit -m "Update knightdomain.txt"
           git push origin main
