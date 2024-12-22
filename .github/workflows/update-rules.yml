@@ -31,12 +31,23 @@ jobs:
       - name: Download and merge rules
         run: |
           # 读取 application.yml 中的规则和输出路径
-          REMOTE_RULES=($(yq eval '.rules.remote' config/application.yml | sed 's/- //g'))  # 获取远程规则列表
-          LOCAL_RULES=($(yq eval '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
-          OUTPUT_PATH=$(yq eval '.output.path' config/application.yml)  # 获取输出目录
-          OUTPUT_FILE=$(yq eval '.output.file' config/application.yml)  # 获取输出文件名
+          REMOTE_RULES=($(yq eval -r '.rules.remote' config/application.yml | sed 's/- //g'))  # 获取远程规则列表
+          LOCAL_RULES=($(yq eval -r '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
+          OUTPUT_PATH=$(yq eval -r '.output.path' config/application.yml)  # 获取输出目录
+          OUTPUT_FILE=$(yq eval -r '.output.file' config/application.yml)  # 获取输出文件名
+          
+          echo "Parsed OUTPUT_PATH: $OUTPUT_PATH"
+          echo "Parsed OUTPUT_FILE: $OUTPUT_FILE"
+
           OUTPUT_PATH=$(echo $OUTPUT_PATH | sed "s/'//g")  # 移除多余单引号
           OUTPUT_FILE=$(echo $OUTPUT_FILE | sed "s/'//g")  # 移除多余单引号
+          
+          # 如果 OUTPUT_PATH 为空，设置默认路径
+          if [ -z "$OUTPUT_PATH" ]; then
+            OUTPUT_PATH="output"
+            echo "OUTPUT_PATH is empty, using default: $OUTPUT_PATH"
+          fi
+          
           # 创建输出目录
           mkdir -p "$OUTPUT_PATH"
 
