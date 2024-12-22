@@ -60,13 +60,17 @@ jobs:
 
           echo "Rules processed and saved to $OUTPUT_DIR/$OUTPUT_FILE"
 
-      # 提交结果到 develop 分支
+      # 提交结果到 main 分支
       - name: Commit Changes
         id: commit
         run: |
           git config --local user.email "2821711637@qq.com"
           git config --local user.name "sdars"
-          git checkout -b develop
           git add output/
-          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')"
-          git push origin develop --force
+          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+
+      # 推送更改
+      - name: GitHub Push
+        if: steps.commit.outputs.status == 'success' && !cancelled()
+        run: |
+          git push origin main
