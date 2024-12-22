@@ -37,8 +37,8 @@ jobs:
           OUTPUT_FILE=$(yq eval '.output.file' config/application.yml --output-format json | jq -r '.')
 
           # 输出解析的路径和文件名进行调试
-          echo "Parsed OUTPUT_PATH: $OUTPUT_PATH"
-          echo "Parsed OUTPUT_FILE: $OUTPUT_FILE"
+          echo "Parsed OUTPUT_PATH: '$OUTPUT_PATH'"
+          echo "Parsed OUTPUT_FILE: '$OUTPUT_FILE'"
 
           # 如果 OUTPUT_PATH 为空，设置默认路径
           if [ -z "$OUTPUT_PATH" ]; then
@@ -47,11 +47,12 @@ jobs:
           fi
 
           if [ -z "$OUTPUT_FILE" ]; then
-            OUTPUT_FILE="merged_rules.txt"
+            OUTPUT_FILE="knightdomain.txt"
             echo "OUTPUT_FILE is empty, using default: $OUTPUT_FILE"
           fi
 
           # 创建输出目录
+          echo "Creating output directory: $OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
 
           # 下载远程规则并合并
@@ -81,10 +82,12 @@ jobs:
 
           echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
 
-      # 调试输出，确保文件存在
-      - name: Check output path
+      # 检查输出目录及文件是否存在
+      - name: Check output directory
         run: |
-          echo "Checking the output directory: $OUTPUT_PATH"
+          echo "Checking if output directory exists: $OUTPUT_PATH"
+          ls -ld "$OUTPUT_PATH"
+          echo "Checking the content of the output directory:"
           ls -l "$OUTPUT_PATH"
 
       # 提交更改到 main 分支
