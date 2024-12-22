@@ -5,9 +5,10 @@ on:
     # 每天运行三次（00:00, 08:00, 16:00 UTC）
     - cron: "0 0,8,16 * * *"
   workflow_dispatch: # 手动触发
-    push:
-      branches:
-        - main  # 监控 main 分支上的所有更改
+  push: # 文件更新时触发
+    paths:
+      - 'rule/**' # 监控 resource 文件夹中的所有文件
+
 jobs:
   update-rules:
     runs-on: ubuntu-latest
@@ -23,10 +24,10 @@ jobs:
           # 定义文件路径
           REMOTE_RULES=("https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt" "https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt")
           LOCAL_RULE_FILE="resource/myrule.txt"
-          OUTPUT_FILE="resource/config/knightdomain.txt"
+          OUTPUT_FILE="rule/knightdomain.txt"
 
           # 创建输出目录
-          mkdir -p resource/config
+          mkdir -p rule
 
           # 下载远程规则
           TEMP_FILE=$(mktemp)
@@ -52,19 +53,21 @@ jobs:
 
           echo "Merged rules saved to $OUTPUT_FILE"
 
-      # 提交更改到 develop 分支
-      - name: Commit changes if any
+      # 提交更改到 main 分支
+      - name: Push changes to main branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git checkout develop || git checkout -b develop
+          # 拉取远程 main 分支的最新内容
+          git pull origin main
 
-          # Check for changes
-          git add resource/config/knightdomain.txt
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')"
-            git push origin develop
-          else
-            echo "No changes to commit"
-          fi
+          # 切换到 main 分支
+          git checkout main
+
+          # 添加文件并提交
+          git add rule/knightdomain.txt
+          git commit -m "Updated knightdomain.txt at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+
+          # 推送更改到远程 main 分支
+          git push origin main --force
