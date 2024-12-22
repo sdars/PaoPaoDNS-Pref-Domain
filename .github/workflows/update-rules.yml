@@ -6,11 +6,8 @@ on:
     - cron: "0 0,8,16 * * *"
   workflow_dispatch: # 手动触发
     push:
-      paths-ignore:
-        - 'README.md'
-        - '*.md'
-      branches: [ main ]
-    
+      branches:
+        - main  # 监控 main 分支上的所有更改
 jobs:
   update-rules:
     runs-on: ubuntu-latest
