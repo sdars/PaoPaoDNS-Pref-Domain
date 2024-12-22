@@ -101,11 +101,6 @@ jobs:
           # 切换到 main 分支
           git checkout main
 
-          # 检查文件是否存在并添加
-          if [ -f "$OUTPUT_PATH/$OUTPUT_FILE" ]; then
-            git add "$OUTPUT_PATH/$OUTPUT_FILE"
-            git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-            git push origin main --force
-          else
-            echo "Output file not found: $OUTPUT_PATH/$OUTPUT_FILE"
-          fi
+          git add "$OUTPUT_PATH/$OUTPUT_FILE"
+          git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push origin main --force
