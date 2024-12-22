@@ -106,7 +106,7 @@ jobs:
 
           # 检查输出路径并提交更改
           echo "Checking if there are changes to commit..."
-          git add "$OUTPUT_PATH"/"$OUTPUT_FILE"
+          git add $(OUTPUT_PATH)"/"$(OUTPUT_FILE)
           echo "你好$OUTPUT_PATH/$OUTPUT_FILE"
           
           # 如果有变动则提交
