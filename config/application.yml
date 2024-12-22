@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: AdGuard-Rule-White
+  profiles:
+    active: prod
+
+logging:
+  file:
+    path: ./logs
+
+application:
+  rule:
+    # 远程规则
+    remote:
+      - 'https://cdn.jsdelivr.net/gh/hoshsadiq/adblock-nocoin-list/hosts.txt'  # adblock-nocoin-list
+      - 'https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/whitelist.txt'  # GOODBYEADS
+      - 'https://raw.githubusercontent.com/sdars/AdGuard-Rule-White/main/rule/mylist.txt'  # name: 神殿
+    # 本地规则
+    local:
+      - 'rule/mylist.txt'
+  output:
+    path: output                     # 输出路径，相对于项目根目录
+    files:
+      domain.txt:
+        - DOMAIN
+      all.txt:
+        - DOMAIN
+        - REGEX
+        - MODIFY
