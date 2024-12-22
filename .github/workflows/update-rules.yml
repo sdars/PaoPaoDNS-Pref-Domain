@@ -5,6 +5,9 @@ on:
     # 每天运行三次（00:00, 08:00, 16:00 UTC）
     - cron: "0 0,8,16 * * *"
   workflow_dispatch: # 手动触发
+  push: # 文件更新时触发
+    paths:
+      - 'resource/**' # 监控 resource 文件夹中的所有文件
 
 jobs:
   update-rules:
@@ -35,7 +38,11 @@ jobs:
 
           # 合并本地规则
           echo "Merging local rules..."
-          cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
+          if [ -f "$LOCAL_RULE_FILE" ]; then
+            cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
+          else
+            echo "Local rule file not found: $LOCAL_RULE_FILE"
+          fi
 
           # 去除注释和重复项
           echo "Removing duplicates and comments..."
@@ -46,23 +53,13 @@ jobs:
 
           echo "Merged rules saved to $OUTPUT_FILE"
 
-      # 切换到 develop 分支
-      - name: Switch to develop branch
+      # 提交更改到 develop 分支
+      - name: Push changes to develop branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout develop || git checkout -b develop
-
-      # 提交更改到 develop 分支
-      - name: Commit changes
-        run: |
           git add resource/config/knightdomain.txt
           git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-
-      # 推送到 develop 分支
-      - name: Push changes to develop branch
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: develop
+          git push origin develop --force
