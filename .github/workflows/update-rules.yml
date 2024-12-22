@@ -31,11 +31,11 @@ jobs:
       - name: Download and merge rules
         run: |
           # 读取 application.yml 中的规则和输出路径
-          REMOTE_RULES=($(yq eval -r '.rules.remote' config/application.yml | sed 's/- //g'))  # 获取远程规则列表
-          LOCAL_RULES=($(yq eval -r '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
-          OUTPUT_PATH=$(yq eval -r '.output.path' config/application.yml)  # 获取输出目录
-          OUTPUT_FILE=$(yq eval -r '.output.file' config/application.yml)  # 获取输出文件名
-          
+          REMOTE_RULES=($(yq eval '.rules.remote' config/application.yml --output-format json | jq -r '.[]'))  # 获取远程规则列表
+          LOCAL_RULES=($(yq eval '.rules.local' config/application.yml --output-format json | jq -r '.[]'))  # 获取本地规则列表
+          OUTPUT_PATH=$(yq eval '.output.path' config/application.yml --output-format json | jq -r '.')
+          OUTPUT_FILE=$(yq eval '.output.file' config/application.yml --output-format json | jq -r '.')
+
           echo "Parsed OUTPUT_PATH: $OUTPUT_PATH"
           echo "Parsed OUTPUT_FILE: $OUTPUT_FILE"
 
