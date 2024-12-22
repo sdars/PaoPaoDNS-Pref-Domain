@@ -8,6 +8,7 @@ on:
   push: # 文件更新时触发
     paths:
       - 'rule/**' # 监控 rule 文件夹中的所有文件
+      - 'config/**' # 监控 config 文件夹中的所有文件
 
 jobs:
   update-rules:
