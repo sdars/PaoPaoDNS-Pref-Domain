@@ -2,9 +2,8 @@ name: Update Rules and Generate Config
 
 on:
   schedule:
-    # 每天运行三次（00:00, 08:00, 16:00 UTC）
     - cron: "0 0,8,16 * * *"
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
 
 jobs:
   update-rules:
@@ -15,50 +14,50 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 解析配置并生成规则
-      - name: Parse config and generate rules
+      # 下载远程规则并合并
+      - name: Download and merge rules
         run: |
-          # 定义配置文件路径
-          CONFIG_FILE="config/application.yml"
-
-          # 解析 YAML 配置
-          REMOTE_RULES=$(yq '.rules.remote[]' "$CONFIG_FILE")
-          LOCAL_RULES=$(yq '.rules.local[]' "$CONFIG_FILE")
-          OUTPUT_DIR=$(yq '.output.path' "$CONFIG_FILE")
-          OUTPUT_FILE=$(yq '.output.file' "$CONFIG_FILE")
+          # 定义路径
+          REMOTE_RULES=("https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt" "https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt")
+          LOCAL_RULE_FILE="resource/myrule.txt"
+          OUTPUT_DIR="resource/config"
+          OUTPUT_FILE="knightdomain.txt"
 
           # 创建输出目录
           mkdir -p "$OUTPUT_DIR"
 
           # 下载远程规则
           TEMP_FILE=$(mktemp)
-          echo "Downloading remote rules..."
-          for url in $REMOTE_RULES; do
-            echo "Fetching $url"
-            curl -s "$url" >> "$TEMP_FILE"
+          for url in "${REMOTE_RULES[@]}"; do
+            echo "Downloading $url..."
+            curl -s "$url" >> "$TEMP_FILE" || echo "Failed to download $url"
           done
 
           # 合并本地规则
-          echo "Merging local rules..."
-          for local_file in $LOCAL_RULES; do
-            cat "$local_file" >> "$TEMP_FILE"
-          done
+          if [ -f "$LOCAL_RULE_FILE" ]; then
+            echo "Merging local rules..."
+            cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
+          else
+            echo "Local rule file not found: $LOCAL_RULE_FILE"
+          fi
 
           # 去除注释和重复项
-          echo "Processing rules..."
+          echo "Removing duplicates and comments..."
           grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_DIR/$OUTPUT_FILE"
+
+          # 调试输出
+          echo "Generated rules:"
+          cat "$OUTPUT_DIR/$OUTPUT_FILE"
 
           # 清理临时文件
           rm -f "$TEMP_FILE"
 
-          echo "Rules saved to $OUTPUT_DIR/$OUTPUT_FILE"
-
       # 提交结果到 main 分支
-      - name: Push changes to main branch
+      - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add resource/config/knightdomain.txt
-          git commit -m "Update knightdomain.txt"
+          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push origin main
