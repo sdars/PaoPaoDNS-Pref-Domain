@@ -105,9 +105,11 @@ jobs:
           git checkout main
 
           # 检查输出路径并提交更改
+          OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
+          OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
           echo "你好$OUTPUT_PATH/$OUTPUT_FILE"
           echo "Checking if there are changes to commit..."
-          git add $OUTPUT_PATH"/"$OUTPUT_FILE
+          git add "$OUTPUT_PATH/$OUTPUT_FILE"
           
           # 如果有变动则提交
           git diff --cached --quiet || git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')"
