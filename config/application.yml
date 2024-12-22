@@ -6,5 +6,5 @@ rules:
     - 'rule/mylist.txt'
 
 output:
-  path: 'rule/config' # 输出目录
+  path: 'output' # 输出目录
   file: 'knightdomain.txt' # 输出文件名
