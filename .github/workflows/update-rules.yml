@@ -92,6 +92,10 @@ jobs:
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
+          # 确保当前目录是仓库根目录
+          cd /home/runner/work/PaoPaoDNS-Pref-Domain/PaoPaoDNS-Pref-Domain
+
+          # 确保 Git 配置正确
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
