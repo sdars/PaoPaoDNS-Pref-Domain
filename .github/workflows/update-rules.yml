@@ -89,14 +89,6 @@ jobs:
 
           echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
 
-      # 检查输出目录及文件是否存在
-      - name: Check output directory
-        run: |
-          echo "Checking if output directory exists: $OUTPUT_PATH"
-          ls -ld "$OUTPUT_PATH"  # 显示输出目录详细信息
-          echo "Checking the content of the output directory:"
-          ls -l "$OUTPUT_PATH"  # 列出输出目录内容
-
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
