@@ -88,9 +88,7 @@ jobs:
           rm -f "$TEMP_FILE"
 
           echo "Merged rules saved to $OUTPUT_PATH/$OUTPUT_FILE"
-      # 在 Checkout 之后的某个地方，打印路径调试：
-        - name: Debug output path
-          run: echo "Output path: $OUTPUT_PATH"
+
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
@@ -103,6 +101,12 @@ jobs:
           # 切换到 main 分支
           git checkout main
 
+          # 检查输出路径并提交更改
+          echo "Checking if there are changes to commit..."
           git add "$OUTPUT_PATH/$OUTPUT_FILE"
-          git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push origin main --force
+          
+          # 如果有变动则提交
+          git diff --cached --quiet || git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')"
+
+          # 推送更改
+          git push origin main
