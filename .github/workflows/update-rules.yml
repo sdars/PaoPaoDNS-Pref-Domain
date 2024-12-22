@@ -35,7 +35,8 @@ jobs:
           LOCAL_RULES=($(yq eval '.rules.local' config/application.yml | sed 's/- //g'))  # 获取本地规则列表
           OUTPUT_PATH=$(yq eval '.output.path' config/application.yml)  # 获取输出目录
           OUTPUT_FILE=$(yq eval '.output.file' config/application.yml)  # 获取输出文件名
-
+          echo $OUTPUT_FILE
+          echo $OUTPUT_PATH
           # 创建输出目录
           mkdir -p "$OUTPUT_PATH"
 
