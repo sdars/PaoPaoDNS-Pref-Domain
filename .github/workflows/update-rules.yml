@@ -34,8 +34,8 @@ jobs:
           echo "Reading configuration from config/application.yml"
 
           # 使用 yq 获取配置，确保输出格式正确
-          REMOTE_RULES=$(yq e '.rules.remote' config/application.yml | tr -d "'")
-          LOCAL_RULES=$(yq e '.rules.local' config/application.yml | tr -d "'")
+          REMOTE_RULES=$(yq e '.rules.remote[]' config/application.yml)
+          LOCAL_RULES=$(yq e '.rules.local[]' config/application.yml)
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
 
@@ -62,14 +62,14 @@ jobs:
 
           # 下载远程规则并合并
           TEMP_FILE=$(mktemp)
-          for url in $(echo $REMOTE_RULES | tr ' ' '\n'); do
+          for url in $REMOTE_RULES; do
             echo "Downloading $url..."
             curl -s "$url" >> "$TEMP_FILE"
           done
 
           # 合并本地规则
           echo "Merging local rules..."
-          for local_file in $(echo $LOCAL_RULES | tr ' ' '\n'); do
+          for local_file in $LOCAL_RULES; do
             if [ -f "$local_file" ]; then
               cat "$local_file" >> "$TEMP_FILE"
             else
