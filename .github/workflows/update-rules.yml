@@ -33,13 +33,12 @@ jobs:
           # 读取 application.yml 中的规则和输出路径
           echo "Reading configuration from config/application.yml"
 
-          # 使用 yq 获取配置，确保输出格式正确
           REMOTE_RULES=$(yq e '.rules.remote[]' config/application.yml)
           LOCAL_RULES=$(yq e '.rules.local[]' config/application.yml)
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
 
-          # 输出配置值，帮助调试
+          # 添加调试输出
           echo "REMOTE_RULES: $REMOTE_RULES"
           echo "LOCAL_RULES: $LOCAL_RULES"
           echo "OUTPUT_PATH: $OUTPUT_PATH"
