@@ -2,8 +2,9 @@ name: Update Rules and Generate Config
 
 on:
   schedule:
+    # 每天运行三次（00:00, 08:00, 16:00 UTC）
     - cron: "0 0,8,16 * * *"
-  workflow_dispatch:
+  workflow_dispatch: # 手动触发
 
 jobs:
   update-rules:
@@ -17,47 +18,51 @@ jobs:
       # 下载远程规则并合并
       - name: Download and merge rules
         run: |
-          # 定义路径
+          # 定义文件路径
           REMOTE_RULES=("https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt" "https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt")
           LOCAL_RULE_FILE="resource/myrule.txt"
-          OUTPUT_DIR="resource/config"
-          OUTPUT_FILE="knightdomain.txt"
+          OUTPUT_FILE="resource/config/knightdomain.txt"
 
           # 创建输出目录
-          mkdir -p "$OUTPUT_DIR"
+          mkdir -p resource/config
 
           # 下载远程规则
           TEMP_FILE=$(mktemp)
           for url in "${REMOTE_RULES[@]}"; do
             echo "Downloading $url..."
-            curl -s "$url" >> "$TEMP_FILE" || echo "Failed to download $url"
+            curl -s "$url" >> "$TEMP_FILE"
           done
 
           # 合并本地规则
-          if [ -f "$LOCAL_RULE_FILE" ]; then
-            echo "Merging local rules..."
-            cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
-          else
-            echo "Local rule file not found: $LOCAL_RULE_FILE"
-          fi
+          echo "Merging local rules..."
+          cat "$LOCAL_RULE_FILE" >> "$TEMP_FILE"
 
           # 去除注释和重复项
           echo "Removing duplicates and comments..."
-          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_DIR/$OUTPUT_FILE"
-
-          # 调试输出
-          echo "Generated rules:"
-          cat "$OUTPUT_DIR/$OUTPUT_FILE"
+          grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_FILE"
 
           # 清理临时文件
           rm -f "$TEMP_FILE"
 
-      # 提交结果到 main 分支
-      - name: Commit and push changes
+          echo "Merged rules saved to $OUTPUT_FILE"
+
+      # 切换到 develop 分支
+      - name: Switch to develop branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          git checkout develop || git checkout -b develop
+
+      # 提交更改到 develop 分支
+      - name: Commit changes
+        run: |
           git add resource/config/knightdomain.txt
           git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push origin main
+
+      # 推送到 develop 分支
+      - name: Push changes to develop branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: develop
