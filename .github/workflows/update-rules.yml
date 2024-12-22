@@ -1,0 +1,72 @@
+name: Update Filters
+
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - '*.md'
+    branches: [main]
+  schedule:
+    - cron: 0 */12 * * *  # 每 12 小时执行一次
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  Update_Filters:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v3
+
+      # 安装依赖（如 curl 和 yq）
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq
+
+      # 读取配置并处理规则
+      - name: Process Rules
+        run: |
+          # 定义文件路径
+          CONFIG_FILE="config/application.yml"
+          TEMP_RULES=$(mktemp)
+          OUTPUT_DIR="output"
+          OUTPUT_FILE="domain.txt"
+
+          # 创建输出目录
+          mkdir -p $OUTPUT_DIR
+
+          # 读取远程规则
+          REMOTE_RULES=$(yq '.application.rule.remote[]' $CONFIG_FILE)
+          echo "Downloading remote rules..."
+          for url in $REMOTE_RULES; do
+            echo "Fetching $url..."
+            curl -s "$url" >> "$TEMP_RULES"
+          done
+
+          # 读取本地规则
+          LOCAL_RULES=$(yq '.application.rule.local[]' $CONFIG_FILE)
+          echo "Adding local rules..."
+          for file in $LOCAL_RULES; do
+            cat "$file" >> "$TEMP_RULES"
+          done
+
+          # 去重和清理
+          echo "Removing duplicates and comments..."
+          grep -vE '^\s*#|^\s*$' "$TEMP_RULES" | sort -u > "$OUTPUT_DIR/$OUTPUT_FILE"
+
+          echo "Rules processed and saved to $OUTPUT_DIR/$OUTPUT_FILE"
+
+      # 提交结果到 develop 分支
+      - name: Commit Changes
+        id: commit
+        run: |
+          git config --local user.email "2821711637@qq.com"
+          git config --local user.name "sdars"
+          git checkout -b develop
+          git add output/
+          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin develop --force
