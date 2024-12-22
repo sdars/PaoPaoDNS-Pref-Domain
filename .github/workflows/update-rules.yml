@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # 手动触发
   push: # 文件更新时触发
     paths:
-      - 'resource/**' # 监控 resource 文件夹中的所有文件
+      - 'resource/**'  # 监控 resource 文件夹中的所有文件
 
 jobs:
   update-rules:
@@ -54,12 +54,18 @@ jobs:
           echo "Merged rules saved to $OUTPUT_FILE"
 
       # 提交更改到 develop 分支
-      - name: Push changes to develop branch
+      - name: Commit changes if any
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout develop || git checkout -b develop
+
+          # Check for changes
           git add resource/config/knightdomain.txt
-          git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push origin develop --force
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Updated rules at $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin develop
+          else
+            echo "No changes to commit"
+          fi
