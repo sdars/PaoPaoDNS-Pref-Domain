@@ -33,26 +33,26 @@ jobs:
           # 读取 application.yml 中的规则和输出路径
           echo "Reading configuration from config/application.yml"
 
+          # 使用 yq 获取配置中的远程和本地规则以及输出路径
           REMOTE_RULES=$(yq e '.rules.remote[]' config/application.yml)
           LOCAL_RULES=$(yq e '.rules.local[]' config/application.yml)
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
 
-          # 添加调试输出
+          # 输出配置文件读取后的调试信息
           echo "REMOTE_RULES: $REMOTE_RULES"
           echo "LOCAL_RULES: $LOCAL_RULES"
           echo "OUTPUT_PATH: $OUTPUT_PATH"
           echo "OUTPUT_FILE: $OUTPUT_FILE"
 
-          # 如果 OUTPUT_PATH 为空，设置默认路径
+          # 检查 OUTPUT_PATH 是否为空
           if [ -z "$OUTPUT_PATH" ]; then
-            OUTPUT_PATH="output"
-            echo "OUTPUT_PATH is empty, using default: $OUTPUT_PATH"
+            echo "OUTPUT_PATH is empty. Setting default value."
+            OUTPUT_PATH="output"  # 设置默认值
           fi
 
           if [ -z "$OUTPUT_FILE" ]; then
-            OUTPUT_FILE="knightdomain.txt"
-            echo "OUTPUT_FILE is empty, using default: $OUTPUT_FILE"
+            OUTPUT_FILE="knightdomain.txt"  # 设置默认文件名
           fi
 
           # 创建输出目录
@@ -89,9 +89,9 @@ jobs:
       - name: Check output directory
         run: |
           echo "Checking if output directory exists: $OUTPUT_PATH"
-          ls -ld "$OUTPUT_PATH"
+          ls -ld "$OUTPUT_PATH"  # 显示输出目录详细信息
           echo "Checking the content of the output directory:"
-          ls -l "$OUTPUT_PATH"
+          ls -l "$OUTPUT_PATH"  # 列出输出目录内容
 
       # 提交更改到 main 分支
       - name: Push changes to main branch
