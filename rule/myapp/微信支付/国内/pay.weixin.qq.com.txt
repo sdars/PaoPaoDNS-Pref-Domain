@@ -1,0 +1,8 @@
+static-oversea.pay.weixin.qq.com
+support.pay.weixin.qq.com
+api.pay.weixin.qq.com
+osapp.pay.weixin.qq.com
+hkshort.pay.weixin.qq.com
+mlshort.pay.weixin.qq.com
+szshort.pay.weixin.qq.com
+short.pay.weixin.qq.com
