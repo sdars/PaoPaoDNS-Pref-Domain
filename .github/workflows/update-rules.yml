@@ -28,17 +28,20 @@ jobs:
         run: |
           echo "Reading configuration from config/application.yml"
 
+          # 读取配置
           REMOTE_RULES=$(yq e '.rules.remote[]' config/application.yml)
           LOCAL_RULES=$(yq e '.rules.local[]' config/application.yml)
           DIRECTORIES=$(yq e '.rules.directories[]' config/application.yml)
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
 
+          # 设置默认值
           [ -z "$OUTPUT_PATH" ] && OUTPUT_PATH="output"
           [ -z "$OUTPUT_FILE" ] && OUTPUT_FILE="knightdomain.txt"
 
           mkdir -p "$OUTPUT_PATH"
 
+          # 临时文件
           LOCAL_TEMP=$(mktemp)
           DIR_TEMP=$(mktemp)
           REMOTE_TEMP=$(mktemp)
@@ -53,15 +56,11 @@ jobs:
             fi
           done
 
-          # 处理目录中的规则
+          # 递归处理目录中的规则
           echo "Processing directories for rules..."
           for dir in $DIRECTORIES; do
             if [ -d "$dir" ]; then
-              for file in "$dir"/*; do
-                if [ -f "$file" ]; then
-                  cat "$file" >> "$DIR_TEMP"
-                fi
-              done
+              find "$dir" -type f -name '*.txt' -exec cat {} + >> "$DIR_TEMP"
             else
               echo "Directory not found: $dir"
             fi
@@ -76,8 +75,13 @@ jobs:
           # 合并内容时按顺序保留
           echo "Merging all rules in order..."
           {
+            echo "# Local Rules"
             cat "$LOCAL_TEMP"
+
+            echo "# Directory Rules"
             cat "$DIR_TEMP"
+
+            echo "# Remote Rules"
             cat "$REMOTE_TEMP"
           } | grep -vE '^\s*#|^\s*$' | awk '!seen[$0]++' > "$OUTPUT_PATH/$OUTPUT_FILE"
 
