@@ -1,7 +1,7 @@
 rules:
   remote: # 远程规则来源
-    - 'https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt'
-    - 'https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt'
+    #- 'https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt'
+    #- 'https://raw.githubusercontent.com/kkkgo/shankou/main/domains.txt'
     - 'https://raw.githubusercontent.com/sdars/PaoPaoDNS-Pref-Domain/refs/heads/main/rule/ba.txt'
   local: # 本地规则文件路径（相对于仓库根目录）
     - 'rule/mylist.txt'
