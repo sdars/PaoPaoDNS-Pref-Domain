@@ -30,40 +30,24 @@ jobs:
       # 读取配置文件并合并规则
       - name: Download and merge rules
         run: |
-          # 读取 application.yml 中的规则和输出路径
           echo "Reading configuration from config/application.yml"
 
-          # 使用 yq 获取配置中的远程和本地规则以及输出路径
+          # 使用 yq 获取配置
           REMOTE_RULES=$(yq e '.rules.remote[]' config/application.yml)
           LOCAL_RULES=$(yq e '.rules.local[]' config/application.yml)
+          DIRECTORIES=$(yq e '.rules.directories[]' config/application.yml)
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
 
-          # 输出配置文件读取后的调试信息
-          echo "REMOTE_RULES: $REMOTE_RULES"
-          echo "LOCAL_RULES: $LOCAL_RULES"
-          echo "OUTPUT_PATH: $OUTPUT_PATH"
-          echo "OUTPUT_FILE: $OUTPUT_FILE"
-
-          # 检查 OUTPUT_PATH 是否为空
-          if [ -z "$OUTPUT_PATH" ]; then
-            echo "OUTPUT_PATH is empty. Setting default value."
-            OUTPUT_PATH="output"  # 设置默认值
-          fi
-
-          if [ -z "$OUTPUT_FILE" ]; then
-            OUTPUT_FILE="knightdomain.txt"  # 设置默认文件名
-          fi
-
-          # 打印 OUTPUT_PATH 确保其值正确
-          echo "Final OUTPUT_PATH: $OUTPUT_PATH"
-          echo "Final OUTPUT_FILE: $OUTPUT_FILE"
+          # 设置默认值
+          [ -z "$OUTPUT_PATH" ] && OUTPUT_PATH="output"
+          [ -z "$OUTPUT_FILE" ] && OUTPUT_FILE="knightdomain.txt"
 
           # 创建输出目录
           echo "Creating output directory: $OUTPUT_PATH"
           mkdir -p "$OUTPUT_PATH"
 
-          # 下载远程规则并合并
+          # 下载远程规则
           TEMP_FILE=$(mktemp)
           for url in $REMOTE_RULES; do
             echo "Downloading $url..."
@@ -80,6 +64,22 @@ jobs:
             fi
           done
 
+          # 扫描并读取目录下所有文件
+          echo "Scanning directories for rules..."
+          for dir in $DIRECTORIES; do
+            if [ -d "$dir" ]; then
+              echo "Processing directory: $dir"
+              for file in "$dir"/*; do
+                if [ -f "$file" ]; then
+                  echo "Reading file: $file"
+                  cat "$file" >> "$TEMP_FILE"
+                fi
+              done
+            else
+              echo "Directory not found: $dir"
+            fi
+          done
+
           # 去除注释和重复项
           echo "Removing duplicates and comments..."
           grep -vE '^\s*#|^\s*$' "$TEMP_FILE" | sort -u > "$OUTPUT_PATH/$OUTPUT_FILE"
@@ -92,26 +92,14 @@ jobs:
       # 提交更改到 main 分支
       - name: Push changes to main branch
         run: |
-          # 确保当前目录是仓库根目录
-
-          # 确保 Git 配置正确
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # 拉取远程 main 分支的最新内容
           git pull origin main
-
-          # 切换到 main 分支
           git checkout main
 
-          # 检查输出路径并提交更改
+          # 提交更改
           OUTPUT_PATH=$(yq e '.output.path' config/application.yml)
           OUTPUT_FILE=$(yq e '.output.file' config/application.yml)
-          echo "Checking if there are changes to commit..."
           git add "$OUTPUT_PATH/$OUTPUT_FILE"
-          
-          # 如果有变动则提交
           git diff --cached --quiet || git commit -m "Updated $OUTPUT_FILE at $(date +'%Y-%m-%d %H:%M:%S')"
-
-          # 推送更改
           git push origin main
