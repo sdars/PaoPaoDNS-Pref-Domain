@@ -1,1 +1,17 @@
+tts.weread.qq.com
+testweb.weread.qq.com
+ink.weread.qq.com
+lambda.weread.qq.com
+download.weread.qq.com
+tech.weread.qq.com
+svp-cdn.weread.qq.com
+mail.weread.qq.com
+oss.weread.qq.com
+cp.weread.qq.com
+service.weread.qq.com
+x.weread.qq.com
+res.weread.qq.com
+cdn.weread.qq.com
+gap.weread.qq.com
+i.weread.qq.com
 sjjsisiansusjskakw.com
