@@ -1,0 +1,6 @@
+dtm.alipay.cn
+render.alipay.cn
+paas.alipay.cn
+l.alipay.cn
+www.alipay.cn
+u.alipay.cn
