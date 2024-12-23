@@ -1,0 +1,16 @@
+mp.pay.qq.com
+big5.pay.qq.com
+mini.pay.qq.com
+g.pay.qq.com
+www.pay.qq.com
+sandbox.pay.qq.com
+static.pay.qq.com
+mfile.pay.qq.com
+app.pay.qq.com
+q.pay.qq.com
+pagedoo.pay.qq.com
+dev.pay.qq.com
+pagedooapi.pay.qq.com
+ptlogin2.pay.qq.com
+my.pay.qq.com
+sandbox.my.pay.qq.com
