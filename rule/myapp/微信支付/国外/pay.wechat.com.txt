@@ -1,0 +1,14 @@
+cs.pay.wechat.com
+g.pay.wechat.com
+api.pay.wechat.com
+hktest.pay.wechat.com
+res.pay.wechat.com
+merchant.pay.wechat.com
+h5.pay.wechat.com
+zatest.pay.wechat.com
+ppe.pay.wechat.com
+hk.pay.wechat.com
+m.pay.wechat.com
+sgilinkshort.pay.wechat.com
+za.pay.wechat.com
+sgshort.pay.wechat.com
