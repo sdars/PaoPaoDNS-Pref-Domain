@@ -14,4 +14,3 @@ res.weread.qq.com
 cdn.weread.qq.com
 gap.weread.qq.com
 i.weread.qq.com
-sjjsisiansusjskakw.com
