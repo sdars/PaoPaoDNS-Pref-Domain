@@ -1,0 +1,5 @@
+events.jdapi.com
+handa.jdapi.com
+general.jdapi.com
+www.jdapi.com
+api.jdapi.com
