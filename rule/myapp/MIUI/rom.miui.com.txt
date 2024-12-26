@@ -1,0 +1,4 @@
+connekt.rom.miui.com
+connect.rom.miui.com
+connect.intl.rom.miui.com
+
