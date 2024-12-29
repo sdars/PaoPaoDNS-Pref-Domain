@@ -1,0 +1,16 @@
+vip-unicom-mum.alibabachengdun.com
+cdn-pum.alibabachengdun.com
+us-mum.alibabachengdun.com
+vip-cmcc-umdc.alibabachengdun.com
+vip-unicom-umdc.alibabachengdun.com
+vip-cmcc-mum.alibabachengdun.com
+bdc.alibabachengdun.com
+vip-bgp-mum.alibabachengdun.com
+vip-chinanet-umdc.alibabachengdun.com
+acs-mum.alibabachengdun.com
+sg-pum.alibabachengdun.com
+vip-chinanet-mum.alibabachengdun.com
+mum.alibabachengdun.com
+vip-bgp-umdc.alibabachengdun.com
+umdc.alibabachengdun.com
+cdn-mum.alibabachengdun.com
