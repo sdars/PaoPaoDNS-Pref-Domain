@@ -1,0 +1,10 @@
+app.cloud.servicewechat.com
+resstatic.servicewechat.com
+ws.cloud.servicewechat.com
+sz.servicewechat.com
+res2.servicewechat.com
+cloud.servicewechat.com
+www.servicewechat.com
+sh.servicewechat.com
+hk.servicewechat.com
+res.servicewechat.com
