@@ -1,0 +1,8 @@
+logs.steampy.com
+download.steampy.com
+apk.steampy.com
+image.steampy.com
+bbs.steampy.com
+www.steampy.com
+waste.steampy.com
+file.steampy.com
