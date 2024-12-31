@@ -1,0 +1,6 @@
+test.itdog.cn
+wss.itdog.cn
+bug.itdog.cn
+oss.itdog.cn
+ipv6.itdog.cn
+www.itdog.cn
