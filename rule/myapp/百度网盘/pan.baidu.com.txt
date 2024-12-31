@@ -1,0 +1,8 @@
+changjietong.pan.baidu.com
+actyun.pan.baidu.com
+ipet.pan.baidu.com
+www.changjietong.pan.baidu.com
+localhost.pan.baidu.com
+socket.pan.baidu.com
+update.pan.baidu.com
+webpush.pan.baidu.com
