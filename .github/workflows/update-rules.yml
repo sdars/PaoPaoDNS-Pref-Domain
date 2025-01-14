@@ -2,7 +2,8 @@ name: Update Rules and Generate Config
 
 on:
   schedule:
-    - cron: "0 0,8,16 * * *" # 每天运行三次
+    #- cron: "0 0,8,16 * * *" # 每天运行三次
+    - cron: "0 * * * *"
   workflow_dispatch:
   push:
     paths:
