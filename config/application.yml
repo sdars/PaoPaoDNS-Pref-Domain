@@ -3,6 +3,7 @@ rules:
     - 'https://raw.githubusercontent.com/kkkgo/PaoPao-Pref/main/domains.txt'
     - 'https://raw.githubusercontent.com/sdars/PaoPaoDNS_Domain/refs/heads/main/output/knightdomain.txt'
     - 'https://raw.githubusercontent.com/sdars/PaoPaoDNS_Domain_File/refs/heads/main/rule/mosdnslogdomain.txt'
+    - 'https://listback.655618.xyz/d/123123/MosDomain/mosdnslogdomain.txt'
   local: # 本地规则文件路径（相对于仓库根目录）
     - 'rule/mylist.txt'
   directories: # 本地目录路径，用于扫描文件
